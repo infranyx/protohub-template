@@ -1,0 +1,11 @@
+version: v1
+name: buf.build/infranyx/golang-grpc-template
+# deps:
+#   - buf.build/googleapis/googleapis
+#   - buf.build/acme/paymentapis
+lint:
+  use:
+    - DEFAULT
+breaking:
+  use:
+    - FILE
