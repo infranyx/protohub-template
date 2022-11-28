@@ -1,0 +1,8 @@
+version: v1
+name: buf.build/infranyx/protobuf-template
+lint:
+  use:
+    - DEFAULT
+breaking:
+  use:
+    - FILE
