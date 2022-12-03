@@ -31,7 +31,7 @@ jobs:
           go mod tidy
           cd ../..
       - name: Pushes Generated Go Module
-        uses: cpina/github-action-push-to-another-repository@main
+        uses: cpina/github-action-push-to-another-repository@v1.5.1
         env:
           # SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
@@ -41,22 +41,17 @@ jobs:
           destination-repository-name: ${{env.GO_REPOSITORY}}
           # user-email:
           target-branch: main
-      - name: "Create Golang Release"
-        uses: "actions/github-script@v5"
+      - name: Create Golang Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.API_TOKEN_GITHUB }} # This token is provided by Actions, you do not need to create your own token
         with:
-          github-token: "${{ secrets.API_TOKEN_GITHUB }}"
-          script: |
-            try {
-              const { GO_REPOSITORY, RELEASE_TAG } = process.env
-              await github.rest.repos.createRelease({
-                draft: false,
-                generate_release_notes: true,
-                name: RELEASE_TAG,
-                owner: context.repo.owner,
-                prerelease: false,
-                repo: `github.com/infranyx/${GO_REPOSITORY}`,
-                tag_name: RELEASE_TAG,
-              });
-            } catch (error) {
-              core.setFailed(error.message);
-            }
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release
+            - Generated Golang Code
+          draft: false
+          prerelease: false
+          # owner: context.repo.owner
+          repo: "github.com/infranyx/${{env.GO_REPOSITORY}}"
