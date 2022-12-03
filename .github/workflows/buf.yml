@@ -14,10 +14,11 @@ jobs:
           version: latest
       - name: Install protoc-gen-go
         run: |
-          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
-          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
-          go version
-          echo 'export PATH="$PATH:$(go env GOPATH)/bin"'
+          go get -u google.golang.org/protobuf/cmd/protoc-gen-go
+          go install google.golang.org/protobuf/cmd/protoc-gen-go
+          go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
+          export PATH="$PATH:$(go env GOPATH)/bin"
       - name: Buf Generate
         run: buf generate
       - name: Init Go Module
