@@ -2,6 +2,9 @@ name: Generate, Checking breaking change and Lint buf
 
 on: push
 
+env:
+  GO_REPOSITORY: "protobuf-template-go"
+
 jobs:
   build:
     runs-on: ubuntu-latest
