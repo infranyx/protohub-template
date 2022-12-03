@@ -35,7 +35,7 @@ jobs:
           # SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
-          source-directory: "go/gen"
+          source-directory: "gen/go"
           destination-github-username: "infranyx"
           destination-repository-name: ${{env.GO_REPOSITORY}}
           # user-email:
