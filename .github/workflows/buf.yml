@@ -53,5 +53,5 @@ jobs:
             - Generated Golang Code
           draft: false
           prerelease: false
-          # owner: context.repo.owner
+          owner: context.repo.owner
           repo: "github.com/infranyx/${{env.GO_REPOSITORY}}"
