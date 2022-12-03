@@ -1,0 +1,51 @@
+name: Generate, Checking breaking change and Lint buf
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+      - uses: actions/checkout@v2
+      - name: Buf Geenerat
+      - uses: bufbuild/buf-setup-action@v1.9.0
+        with:
+          version: latest
+      - run: buf generate
+      - name: Init Go Module
+      - run: |
+          cd go/gen
+          go mod init github.com/infranyx/${{env.GO_REPOSITORY}}
+          go mod tidy
+          cd ../..
+      - name: Pushes Generated Go Module
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          # SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          source-directory: "go/gen"
+          destination-github-username: "infranyx"
+          destination-repository-name: ${{env.GO_REPOSITORY}}
+          # user-email:
+          target-branch: main
+      - name: "Create Golang Release"
+        uses: "actions/github-script@v5"
+        with:
+          github-token: "${{ secrets.API_TOKEN_GITHUB }}"
+          script: |
+            try {
+              const { GO_REPOSITORY, RELEASE_TAG } = process.env
+              await github.rest.repos.createRelease({
+                draft: false,
+                generate_release_notes: true,
+                name: RELEASE_TAG,
+                owner: context.repo.owner,
+                prerelease: false,
+                repo: `github.com/infranyx/${GO_REPOSITORY}`,
+                tag_name: RELEASE_TAG,
+              });
+            } catch (error) {
+              core.setFailed(error.message);
+            }
