@@ -39,19 +39,25 @@ jobs:
           source-directory: "gen/go"
           destination-github-username: "infranyx"
           destination-repository-name: ${{env.GO_REPOSITORY}}
-          # user-email:
           target-branch: main
-      - name: Create Golang Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.API_TOKEN_GITHUB }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            Changes in this Release
-            - Generated Golang Code
-          draft: false
-          prerelease: false
-          owner: infranyx
-          repo: ${{env.GO_REPOSITORY}}
+      # - run:
+      #   npm i semver@7.3.8
+      # - name: Create Golang Release
+      #   uses: "actions/github-script@v5"
+      #   with:
+      #     github-token: "${{ secrets.API_TOKEN_GITHUB }}"
+      #     script: |
+      #       try {
+      #         const { GO_REPOSITORY, RELEASE_TAG } = process.env
+      #         await github.rest.repos.createRelease({
+      #           // tag_name: RELEASE_TAG,
+      #           draft: false,
+      #           release_name: `Release ${github.ref}`,
+      #           generate_release_notes: true,
+      #           owner: context.repo.owner,
+      #           prerelease: false,
+      #           repo: GO_REPOSITORY,
+      #         });
+      #       } catch (error) {
+      #         core.setFailed(error.message);
+      #       }

@@ -3,24 +3,16 @@ syntax = "proto3";
 package error;
 option go_package = "./error";
 
-message CustomError {
-  string title = 1;
-  string code = 2;
-  string detail = 3;
-  string timestamp = 4;
-  optional string stackTrace = 5;
+message Details {
+  string id = 1;
+  string desc =2;
 }
 
-// message Details {
-//     string field = 1;
-//     string desc =2;
-// }
-
-// message RepeatedError {
-//   string title = 1;
-//   string code = 2;
-//   repeated Details details = 3;
-//   string timestamp = 4;
-//   optional string stackTrace = 5;
-// }
-
+message CustomError {
+  string title = 1;
+  int64 code = 2;
+  string msg = 3;
+  string timestamp = 4;
+  optional string stackTrace = 5;
+  repeated Details details = 6;
+}
