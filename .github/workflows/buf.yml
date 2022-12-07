@@ -40,7 +40,7 @@ jobs:
           destination-github-username: "infranyx"
           destination-repository-name: ${{env.GO_REPOSITORY}}
           target-branch: main
-      - run: npm i semver@7.3.8 @octokit/rest@18.12.0
+      - run: npm i semver@7.3.8
       - name: Create Golang Release
         uses: "actions/github-script@v5"
         with:
