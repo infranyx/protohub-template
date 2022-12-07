@@ -43,14 +43,17 @@ jobs:
       - run: npm i semver@7.3.8 @octokit/rest@18.12.0
       - name: Create Golang Release
         uses: "actions/github-script@v5"
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
           github-token: "${{ secrets.API_TOKEN_GITHUB }}"
           script: |
             const semver = require("semver");
             const { Octokit } = require("@octokit/rest");
             console.log(process.env)
+
 #            try {
-#              const { GO_REPOSITORY, RELEASE_TAG } = process.env
+#              const { GO_REPOSITORY, API_TOKEN_GITHUB } = process.env
 #              await github.rest.repos.createRelease({
 #                // tag_name: RELEASE_TAG,
 #                draft: false,
