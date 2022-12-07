@@ -56,7 +56,7 @@ jobs:
                 const octokit = new Octokit({
                   auth: API_TOKEN_GITHUB,
                 });
-                const response = await octokit.rest.repos.listTagProtection({
+                const response = await octokit.rest.repos.listTags({
                     owner : context.repo.owner,
                     repo: GO_REPOSITORY,
                 });
