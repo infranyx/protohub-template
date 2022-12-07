@@ -63,6 +63,12 @@ jobs:
                 });
                 
                 console.log(response)
+
+                const response2 = await github.rest.repos.listTags({
+                    owner : context.repo.owner,
+                    repo: GO_REPOSITORY,
+                });
+                consolo.log(response2)
             }
             catch (error) {
                 core.setFailed(error.message);
