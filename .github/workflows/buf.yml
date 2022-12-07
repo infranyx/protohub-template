@@ -56,7 +56,7 @@ jobs:
                 });
                 console.log(response);
             }
-            catch (e) {
+            catch (error) {
                 core.setFailed(error.message);
             }
 #            try {
