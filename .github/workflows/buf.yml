@@ -49,7 +49,7 @@ jobs:
           github-token: "${{ secrets.API_TOKEN_GITHUB }}"
           script: |
             const semver = require("semver");
-            const axios = require('axios');
+            const { Octokit } = require("@octokit/rest");
 
             try{
                 const { GO_REPOSITORY, API_TOKEN_GITHUB } = process.env
@@ -57,10 +57,11 @@ jobs:
                   auth: API_TOKEN_GITHUB,
                 });
 
-                const response = await octokit.rest.repos.listTags({
+                const response = await octokit.rest.repos.listTagProtection({
                     owner : context.repo.owner,
                     repo: GO_REPOSITORY,
                 });
+                
                 console.log(response)
             }
             catch (error) {
