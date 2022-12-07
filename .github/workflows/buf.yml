@@ -43,32 +43,18 @@ jobs:
       - run: npm i semver@7.3.8 @octokit/rest@18.12.0
       - name: Create Golang Release
         uses: "actions/github-script@v5"
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
           github-token: "${{ secrets.API_TOKEN_GITHUB }}"
           script: |
             const semver = require("semver");
-            const { Octokit } = require("@octokit/rest");
 
             try{
-                const { GO_REPOSITORY, API_TOKEN_GITHUB } = process.env
-                const octokit = new Octokit({
-                  auth: API_TOKEN_GITHUB,
-                });
-
-                const response = await octokit.rest.repos.listTags({
+                const { GO_REPOSITORY } = process.env
+                const response = await github.rest.repos.listTags({
                     owner : context.repo.owner,
                     repo: GO_REPOSITORY,
                 });
-                
                 console.log(response)
-
-                const response2 = await github.rest.repos.listTags({
-                    owner : context.repo.owner,
-                    repo: GO_REPOSITORY,
-                });
-                console.log(response2)
             }
             catch (error) {
                 core.setFailed(error.message);
