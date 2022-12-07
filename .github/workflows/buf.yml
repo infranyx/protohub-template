@@ -50,10 +50,24 @@ jobs:
           script: |
             const semver = require("semver");
             const { Octokit } = require("@octokit/rest");
-            console.log(process.env)
+
+            try{
+                const { GO_REPOSITORY, API_TOKEN_GITHUB } = process.env
+                const octokit = new Octokit({
+                  auth: API_TOKEN_GITHUB,
+                });
+                const response = octokit.rest.repos.listTagProtection({
+                    owner : context.repo.owner,
+                    repo: GO_REPOSITORY,
+                });
+                console.log(response);
+            }
+            catch (error) {
+                core.setFailed(error.message);
+            }
 
 #            try {
-#              const { GO_REPOSITORY, API_TOKEN_GITHUB } = process.env
+#              const { GO_REPOSITORY, RELEASE_TAG } = process.env
 #              await github.rest.repos.createRelease({
 #                // tag_name: RELEASE_TAG,
 #                draft: false,
