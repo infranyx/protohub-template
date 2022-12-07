@@ -56,11 +56,18 @@ jobs:
                 const octokit = new Octokit({
                   auth: API_TOKEN_GITHUB,
                 });
-                const response = await octokit.rest.repos.listTags({
+                // for private repos
+                const response1 = await octokit.rest.repos.listTagProtection({
                     owner : context.repo.owner,
                     repo: GO_REPOSITORY,
                 });
-                console.log(response);
+
+                // for public repos
+                const response2 = await octokit.rest.repos.listTags({
+                    owner : context.repo.owner,
+                    repo: GO_REPOSITORY,
+                });
+
             }
             catch (error) {
                 core.setFailed(error.message);
