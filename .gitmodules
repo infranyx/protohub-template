@@ -1,0 +1,3 @@
+[submodule "gen/go"]
+	path = gen/go
+	url = https://github.com/infranyx/protobuf-template-go.git

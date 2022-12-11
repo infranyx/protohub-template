@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package error;
+option go_package = "./error";
+
+message CustomError {
+  string title = 1;
+  int64 code = 2;
+  string msg = 3;
+  string timestamp = 4;
+  optional string stackTrace = 5;
+  map<string,string> details = 6;
+}

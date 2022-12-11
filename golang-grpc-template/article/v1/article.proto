@@ -14,6 +14,17 @@ message CreateArticleResponse {
   string desc = 3;
 }
 
+message GetArticleByIdRequest {
+  string id = 1;
+}
+
+message GetArticleByIdResponse {
+  string id = 1;
+  string name = 2;
+  string desc = 3;
+}
+
 service ArticleService{
   rpc CreateArticle(CreateArticleRequest) returns (CreateArticleResponse);
+  rpc GetArticleById(GetArticleByIdRequest) returns (GetArticleByIdResponse);
 }
