@@ -56,6 +56,7 @@ jobs:
                 });
                 const tags = response.data.map(tag => tag.name);
                 console.log(tags);
+                console.log(context);
             }
             catch (error) {
                 core.setFailed(error.message);
