@@ -54,7 +54,8 @@ jobs:
                     owner : context.repo.owner,
                     repo: GO_REPOSITORY,
                 });
-                console.log(response)
+                const tags = response.data(tag => tag.name);
+                console.log(tags);
             }
             catch (error) {
                 core.setFailed(error.message);
