@@ -54,9 +54,8 @@ jobs:
                     owner : context.repo.owner,
                     repo: GO_REPOSITORY,
                 });
-                // const tags = response.map(tag => tag.name)
-                console.log(response);
-                // console.log(response , "---- \n" , tags , "----- \n" , context); 
+                const tags = response.data.map(tag => tag.name)
+                console.log(response , "---- \n" , tags , "----- \n" , context); 
             }
             catch (error) {
                 core.setFailed(error.message);
