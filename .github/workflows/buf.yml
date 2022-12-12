@@ -26,7 +26,7 @@ jobs:
           buf generate
       - name: Init Go Module
         run: |
-          cp ./ci/release.yml gen/go
+          cp ./ci/release.yml gen/go/.github/workflows
           cd gen/go
           go mod init github.com/infranyx/${{env.GO_REPOSITORY}}
           go mod tidy
@@ -60,18 +60,3 @@ jobs:
             catch (error) {
                 core.setFailed(error.message);
             }
-
-#            try {
-#              const { GO_REPOSITORY, RELEASE_TAG } = process.env
-#              await github.rest.repos.createRelease({
-#                // tag_name: RELEASE_TAG,
-#                draft: false,
-#                release_name: `Release ${github.ref}`,
-#                generate_release_notes: true,
-#                owner: context.repo.owner,
-#                prerelease: false,
-#                repo: GO_REPOSITORY,
-#              });
-#            } catch (error) {
-#              core.setFailed(error.message);
-#            }
