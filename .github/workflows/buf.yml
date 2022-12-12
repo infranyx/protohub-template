@@ -26,7 +26,7 @@ jobs:
           buf generate
       - name: Init Go Module
         run: |
-          mkdir -p gen/go/github/workflows
+          mkdir -p gen/go/.github/workflows
           cp ./ci/release.yml gen/go/.github/workflows
           cd gen/go
           go mod init github.com/infranyx/${{env.GO_REPOSITORY}}
