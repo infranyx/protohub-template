@@ -37,7 +37,8 @@ jobs:
                 if (tags.length === 0) latestVersion = "v0.0.0";
                 else latestVersion = tags[0];
 
-                const finalVersion = semver.inc(latestVersion , "patch");
+                let finalVersion = semver.inc(latestVersion , "patch");
+                finalVersion = `v${finalVersion}`;
                 if (!finalVersion || !semver.valid(finalVersion)) {
                   throw new Error(`Invalid Final Version: ${finalVersion}`);
                 }
