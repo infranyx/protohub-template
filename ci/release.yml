@@ -48,7 +48,7 @@ jobs:
                 console.log("===================================================\n");
 
                 await github.rest.repos.createRelease({
-                  draft: true,
+                  draft: false,
                   tag_name: finalVersion,
                   release_name: finalVersion,
                   generate_release_notes: true,
