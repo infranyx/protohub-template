@@ -32,7 +32,7 @@ jobs:
                     repo: context.repo.repo,
                 });
                 const tags = response.data.map(tag => tag.name.toLowerCase());
-
+                console.log(tags);
                 let latestVersion;
                 if (tags.length === 0) latestVersion = "v0.0.0";
                 else latestVersion = tags[0];
