@@ -50,7 +50,7 @@ jobs:
                   release_name: finalVersion,
                   generate_release_notes: true,
                   prerelease: false,
-                  make_latest: false,
+                  make_latest: "false",
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                 });
