@@ -43,7 +43,7 @@ jobs:
                   throw new Error(`Invalid Final Version: ${finalVersion}`);
                 }
 
-                console.log("\n================== Final Version * ==================");
+                console.log("\n================== Final Version ==================");
                 console.log(`final version: ${finalVersion}`);
                 console.log("===================================================\n");
 
