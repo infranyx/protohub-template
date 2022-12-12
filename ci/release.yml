@@ -1,0 +1,61 @@
+name: Generate, Checking breaking change and Lint buf
+
+on: push
+#on:
+#  pull_request:
+#    branches:
+#      - dev
+#    types:
+#      - closed
+
+env:
+  GO_REPOSITORY: "protobuf-template-go"
+  RELEASE_TAG: "test"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - run: npm i semver@7.3.8
+      - name: Create Golang Release
+        uses: "actions/github-script@v5"
+        with:
+          github-token: "${{ secrets.API_TOKEN_GITHUB }}"
+          script: |
+            const semver = require("semver");
+
+            try{
+                const response = await github.rest.repos.listTags({
+                    owner : context.repo.owner,
+                    repo: context.repo.repo,
+                });
+                const tags = response.data.map(tag => tag.name.toLowerCase());
+
+                let latestVersion;
+                if (tags.length === 0) latestVersion = "v0.0.0";
+                else latestVersion = tags[0];
+
+                const finalVersion = semver.inc(latestVersion , "patch");
+                if (!finalVersion || !semver.valid(finalVersion)) {
+                  throw new Error(`Invalid Final Version: ${finalVersion}`);
+                }
+
+                console.log("\n================== Final Version ==================");
+                console.log(`final version: ${finalVersion}`);
+                console.log("===================================================\n");
+
+                await github.rest.repos.createRelease({
+                  draft: false,
+                  tag_name: finalVersion,
+                  release_name: finalVersion,
+                  generate_release_notes: true,
+                  prerelease: false,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                });
+            }
+            catch (error) {
+                core.setFailed(error.message);
+            }
