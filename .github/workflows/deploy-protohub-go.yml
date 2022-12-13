@@ -36,11 +36,11 @@ jobs:
           if [ $GITHUB_REF == "main" ]
             then
               echo "main branch detected ==> deploy pre-release ci for target repo."
-              cp ./ci/pre-release.yml gen/go/.github/workflows
+              cp ./protohub-ci/pre-release.yml gen/go/.github/workflows
           elif [ $GITHUB_REF == "dev" ]
             then
               echo "dev branch detected ==> deploy beta-release ci for target repo."
-              cp ./ci/beta-release.yml gen/go/.github/workflows
+              cp ./protohub-ci/beta-release.yml gen/go/.github/workflows
           fi
           cd gen/go
           go mod init github.com/infranyx/${{env.GO_REPOSITORY}}
