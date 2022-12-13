@@ -1,4 +1,4 @@
-name: Generate, Checking breaking change and Lint buf
+name: Generate, Lint, Check Breaking Changes and Deploy Proto-Hub
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ on:
       - dev
 
 env:
-  GO_REPOSITORY: "protobuf-template-go"
+  TARGET_REPO: "protobuf-template-go"
 
 jobs:
   merge_job:
@@ -30,7 +30,7 @@ jobs:
         run: |
           export PATH="$PATH:$(go env GOPATH)/bin"
           buf generate
-      - name: Init Go Module
+      - name: Init Target Repo
         run: |
           mkdir -p gen/go/.github/workflows
           if [ $GITHUB_REF == "main" ]
@@ -42,11 +42,13 @@ jobs:
               echo "dev branch detected ==> deploy beta-release ci for target repo."
               cp ./protohub-ci/beta-release.yml gen/go/.github/workflows
           fi
+      - name: Init Go Module
+        run: |
           cd gen/go
-          go mod init github.com/infranyx/${{env.GO_REPOSITORY}}
+          go mod init github.com/infranyx/${{env.TARGET_REPO}}
           go mod tidy
           cd ../..
-      - name: Pushes Generated Go Module
+      - name: Push To ProtoHub
         uses: cpina/github-action-push-to-another-repository@v1.5.1
         env:
           # SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
@@ -54,10 +56,10 @@ jobs:
         with:
           source-directory: "gen/go"
           destination-github-username: "infranyx"
-          destination-repository-name: ${{env.GO_REPOSITORY}}
+          destination-repository-name: ${{env.TARGET_REPO}}
           target-branch: main
       - run: npm i semver@7.3.8
-      - name: Create Golang Release
+      - name: Target Release Info
         uses: "actions/github-script@v5"
         with:
           github-token: "${{ secrets.API_TOKEN_GITHUB }}"
@@ -65,29 +67,37 @@ jobs:
             const semver = require("semver");
 
             try{
-                const { GO_REPOSITORY } = process.env;
-                if (!GO_REPOSITORY) throw new Error("Could Not Found Required Env Variables");
+                const { TARGET_REPO , GITHUB_REF } = process.env;
+                if (!TARGET_REPO) throw new Error("Could Not Found Required Env Variables");
                 
                 const response = await github.rest.repos.listTags({
                     owner : context.repo.owner,
-                    repo: GO_REPOSITORY,
+                    repo: TARGET_REPO,
                 });
                 const tags = response.data.map(tag => tag.name.toLowerCase());
 
                 console.log("\n================== Target Repo Info ==================");
-                console.log("tags: \n" , tags , "\n");
+                console.log("Target Repo: " , TARGET_REPO , "\n");
+                console.log("Tags: \n" , tags , "\n");
 
                 let latestVersion;
                 if (tags.length === 0) latestVersion = "v0.0.0";
                 else latestVersion = tags[0];
-
-                let newVersion = semver.inc(latestVersion , "patch");
-                newVersion = `v${newVersion}`;
+                
+                let newVersion;
+                if (GITHUB_REF === "main") {
+                    newVersion = semver.inc(latestVersion , "minor");
+                    console.log("New Pre-Release Version : " , newVersion , "\n");
+                }
+                else if (GITHUB_REF === "dev") {
+                    newVersion = semver.inc(latestVersion , "patch");
+                    console.log("New Beta-Release Version : " , newVersion , "\n");
+                }
+            
                 if (!newVersion || !semver.valid(newVersion)) {
                   throw new Error(`Invalid New Version: ${newVersion}`);
                 }
 
-                console.log("new version: " , newVersion , "\n");
                 console.log("======================================================\n");
             }
             catch (error) {
