@@ -12,75 +12,75 @@ jobs:
   merge_job:
     # this job will only run if the PR has been merged
     if: github.event.pull_request.merged == true
-    build:
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout
-          uses: actions/checkout@v2
-        - name: Buf Init
-          uses: bufbuild/buf-setup-action@v1.9.0
-          with:
-            version: latest
-        - name: Install protoc-gen-go
-          run: |
-            go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
-            go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
-        - name: Buf Generate
-          run: |
-            export PATH="$PATH:$(go env GOPATH)/bin"
-            buf generate
-        - name: Init Go Module
-          run: |
-            mkdir -p gen/go/.github/workflows
-            cp ./ci/release.yml gen/go/.github/workflows
-            cd gen/go
-            go mod init github.com/infranyx/${{env.GO_REPOSITORY}}
-            go mod tidy
-            cd ../..
-        - name: Pushes Generated Go Module
-          uses: cpina/github-action-push-to-another-repository@v1.5.1
-          env:
-            # SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
-            API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-          with:
-            source-directory: "gen/go"
-            destination-github-username: "infranyx"
-            destination-repository-name: ${{env.GO_REPOSITORY}}
-            target-branch: main
-        - run: npm i semver@7.3.8
-        - name: Create Golang Release
-          uses: "actions/github-script@v5"
-          with:
-            github-token: "${{ secrets.API_TOKEN_GITHUB }}"
-            script: |
-              const semver = require("semver");
-  
-              try{
-                  const { GO_REPOSITORY } = process.env;
-                  const response = await github.rest.repos.listTags({
-                      owner : context.repo.owner,
-                      repo: GO_REPOSITORY,
-                  });
-                  const tags = response.data.map(tag => tag.name.toLowerCase());
-              
-                  console.log("\n================== Current Tags ==================");
-                  console.log("current tags in target repo" , tags);
-                  console.log("===================================================\n");
-              
-                  let latestVersion;
-                  if (tags.length === 0) latestVersion = "v0.0.0";
-                  else latestVersion = tags[0];
-  
-                  let finalVersion = semver.inc(latestVersion , "patch");
-                  finalVersion = `v${finalVersion}`;
-                  if (!finalVersion || !semver.valid(finalVersion)) {
-                    throw new Error(`Invalid Final Version: ${finalVersion}`);
-                  }
-  
-                  console.log("\n================== Final Version ==================");
-                  console.log("final version in target repo" , finalVersion);
-                  console.log("===================================================\n");
-              }
-              catch (error) {
-                  core.setFailed(error.message);
-              }
+#    build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Buf Init
+        uses: bufbuild/buf-setup-action@v1.9.0
+        with:
+          version: latest
+      - name: Install protoc-gen-go
+        run: |
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+      - name: Buf Generate
+        run: |
+          export PATH="$PATH:$(go env GOPATH)/bin"
+          buf generate
+      - name: Init Go Module
+        run: |
+          mkdir -p gen/go/.github/workflows
+          cp ./ci/release.yml gen/go/.github/workflows
+          cd gen/go
+          go mod init github.com/infranyx/${{env.GO_REPOSITORY}}
+          go mod tidy
+          cd ../..
+      - name: Pushes Generated Go Module
+        uses: cpina/github-action-push-to-another-repository@v1.5.1
+        env:
+          # SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          source-directory: "gen/go"
+          destination-github-username: "infranyx"
+          destination-repository-name: ${{env.GO_REPOSITORY}}
+          target-branch: main
+      - run: npm i semver@7.3.8
+      - name: Create Golang Release
+        uses: "actions/github-script@v5"
+        with:
+          github-token: "${{ secrets.API_TOKEN_GITHUB }}"
+          script: |
+            const semver = require("semver");
+
+            try{
+                const { GO_REPOSITORY } = process.env;
+                const response = await github.rest.repos.listTags({
+                    owner : context.repo.owner,
+                    repo: GO_REPOSITORY,
+                });
+                const tags = response.data.map(tag => tag.name.toLowerCase());
+            
+                console.log("\n================== Current Tags ==================");
+                console.log("current tags in target repo" , tags);
+                console.log("===================================================\n");
+            
+                let latestVersion;
+                if (tags.length === 0) latestVersion = "v0.0.0";
+                else latestVersion = tags[0];
+
+                let finalVersion = semver.inc(latestVersion , "patch");
+                finalVersion = `v${finalVersion}`;
+                if (!finalVersion || !semver.valid(finalVersion)) {
+                  throw new Error(`Invalid Final Version: ${finalVersion}`);
+                }
+
+                console.log("\n================== Final Version ==================");
+                console.log("final version in target repo" , finalVersion);
+                console.log("===================================================\n");
+            }
+            catch (error) {
+                core.setFailed(error.message);
+            }
