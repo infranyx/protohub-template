@@ -58,7 +58,7 @@ jobs:
                 const tags = response.data.map(tag => tag.name.toLowerCase());
             
                 console.log("\n================== Current Tags ==================");
-                console.log(tags);
+                console.log("current tags in target repo" , tags);
                 console.log("===================================================\n");
             
                 let latestVersion;
@@ -72,8 +72,7 @@ jobs:
                 }
 
                 console.log("\n================== Final Version ==================");
-                console.log("final version in your target repo");
-                console.log(`<${finalVersion}>`);
+                console.log("final version in target repo" , finalVersion);
                 console.log("===================================================\n");
             }
             catch (error) {
