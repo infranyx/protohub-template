@@ -1,0 +1,45 @@
+name: Lint and Check Breaking Changes
+
+on:
+  pull_request:
+#    types: [ created ]
+    branches:
+      - main
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Buf Init
+        uses: bufbuild/buf-setup-action@v1.9.0
+        with:
+          version: latest
+      - name: Install protoc-gen-go
+        run: |
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+      - name: Buf Generate
+        run: |
+          export PATH="$PATH:$(go env GOPATH)/bin"
+          buf generate
+      - name: Buf Lint
+        run: |
+          buf lint
+      - name: Buf Breaking
+        run: |
+          buf breaking --against .git#branch=$GITHUB_REF
+      
+
+#validate-protos:
+#  steps:
+#    # Run `git checkout`
+#    - uses: actions/checkout@v2
+#    # Install the `buf` CLI
+#    - uses: bufbuild/buf-setup-action@v1
+#    # Run breaking change detection against the `main` branch
+#    - uses: bufbuild/buf-breaking-action@v1
+#      with:
+#        against: 'https://github.com/acme/weather.git#branch=main'
