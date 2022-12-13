@@ -21,7 +21,7 @@ message GetArticleByIdRequest {
 message GetArticleByIdResponse {
   string id = 1;
   string name = 2;
-  string desc = 3;
+//  string desc = 3;
 }
 
 service ArticleService{
