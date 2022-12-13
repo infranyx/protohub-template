@@ -2,11 +2,13 @@ name: Generate, Lint and Check Breaking Changes
 
 on:
   pull_request:
+    types: [ created ]
     branches:
       - main
       - dev
 
 jobs:
+  runs-on: ubuntu-latest
   steps:
     - name: Checkout
       uses: actions/checkout@v2
