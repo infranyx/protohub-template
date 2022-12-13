@@ -1,4 +1,4 @@
-name: Generate, Checking breaking change and Lint buf
+name: Create Beta-Release
 
 on:
   push:
@@ -12,7 +12,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - run: npm i semver@7.3.8
-      - name: Create Golang Release
+      - name: Create Beta Release
         uses: "actions/github-script@v5"
         with:
           github-token: "${{ secrets.API_TOKEN_GITHUB }}"
@@ -26,21 +26,21 @@ jobs:
                 });
                 const tags = response.data.map(tag => tag.name.toLowerCase());
             
-                console.log("\n================== Beta Release ==================");
-                console.log("tags: \n" , tags , "\n");
+                console.log("\n================== Beta-Release ==================");
+                console.log("Tags: \n" , tags , "\n");
             
-                let latestVersion;
-                if (tags.length === 0) latestVersion = "v0.0.0";
-                else latestVersion = tags[0];
+                let lastVersion;
+                if (tags.length === 0) lastVersion = "v0.0.0";
+                else lastVersion = tags[0];
 
-                let newVersion = semver.inc(latestVersion , "patch");
+                let newVersion = semver.inc(lastVersion , "patch");
                 newVersion = `v${newVersion}`;
+            
                 if (!newVersion || !semver.valid(newVersion)) {
                   throw new Error(`Invalid New Version: ${newVersion}`);
                 }
 
-                console.log("new version: " , newVersion , "\n");
-                console.log("===================================================\n");
+                console.log("New Beta-Version: " , newVersion , "\n");
 
                 await github.rest.repos.createRelease({
                   tag_name: newVersion,
@@ -52,6 +52,9 @@ jobs:
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                 });
+                
+                console.log("New Beta-Release Created: " , newVersion , "\n");
+                console.log("===================================================\n");
             }
             catch (error) {
                 core.setFailed(error.message);
