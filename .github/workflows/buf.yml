@@ -4,7 +4,6 @@ on: push
 
 env:
   GO_REPOSITORY: "protobuf-template-go"
-  RELEASE_TAG: "test"
 
 jobs:
   build:
@@ -42,22 +41,3 @@ jobs:
           destination-github-username: "infranyx"
           destination-repository-name: ${{env.GO_REPOSITORY}}
           target-branch: main
-      - run: npm i semver@7.3.8
-      - name: Create Golang Release
-        uses: "actions/github-script@v5"
-        with:
-          github-token: "${{ secrets.API_TOKEN_GITHUB }}"
-          script: |
-            const semver = require("semver");
-
-            try{
-                const { GO_REPOSITORY } = process.env
-                const response = await github.rest.repos.listTags({
-                    owner : context.repo.owner,
-                    repo: GO_REPOSITORY,
-                });
-                console.log(response)
-            }
-            catch (error) {
-                core.setFailed(error.message);
-            }
