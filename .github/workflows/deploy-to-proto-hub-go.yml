@@ -1,6 +1,5 @@
 name: Generate, Checking breaking change and Lint buf
 
-# only trigger on pull request closed events.It will trigger on both <merged> and <closed> events.
 on:
   pull_request:
     types: [ closed ]
@@ -12,7 +11,6 @@ jobs:
   merge_job:
     # this job will only run if the PR has been merged
     if: github.event.pull_request.merged == true
-#    build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -63,9 +61,8 @@ jobs:
                 });
                 const tags = response.data.map(tag => tag.name.toLowerCase());
             
-                console.log("\n================== Current Tags ==================");
-                console.log("current tags in target repo" , tags);
-                console.log("===================================================\n");
+                console.log("\n================== Target Repo ==================");
+                console.log("tags: \n" , tags , "\n");
             
                 let latestVersion;
                 if (tags.length === 0) latestVersion = "v0.0.0";
@@ -77,8 +74,7 @@ jobs:
                   throw new Error(`Invalid Final Version: ${finalVersion}`);
                 }
 
-                console.log("\n================== Final Version ==================");
-                console.log("final version in target repo" , finalVersion);
+                console.log("final version: " , finalVersion , "\n");
                 console.log("===================================================\n");
             }
             catch (error) {
