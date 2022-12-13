@@ -52,7 +52,7 @@ jobs:
             try{
                 const response = await github.rest.repos.listTags({
                     owner : context.repo.owner,
-                    repo: context.repo.repo,
+                    repo: GO_REPOSITORY,
                 });
                 const tags = response.data.map(tag => tag.name.toLowerCase());
             
@@ -71,8 +71,8 @@ jobs:
                 }
 
                 console.log("\n================== Final Version ==================");
-                console.log("final version in your target repo is : ");
-                console.log(`final version: <${finalVersion}>`);
+                console.log("final version in your target repo");
+                console.log(`<${finalVersion}>`);
                 console.log("===================================================\n");
             }
             catch (error) {
