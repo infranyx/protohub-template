@@ -3,6 +3,9 @@ name: Generate, Checking breaking change and Lint buf
 on:
   pull_request:
     types: [ closed ]
+    branches:
+      - main
+      - dev
 
 env:
   GO_REPOSITORY: "protobuf-template-go"
