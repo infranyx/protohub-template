@@ -9,7 +9,6 @@ on:
 
 env:
   GO_REPOSITORY: "protobuf-template-go"
-  SRC_BRANCH: ${{ github.ref_name }}
 
 jobs:
   merge_job:
@@ -33,9 +32,16 @@ jobs:
           buf generate
       - name: Init Go Module
         run: |
-          echo running on branch ${GITHUB_REF##*/}
           mkdir -p gen/go/.github/workflows
-          cp ./ci/release.yml gen/go/.github/workflows
+          if [ $GITHUB_REF == "main" ]
+            then
+              echo "main branch detected ==> deploy pre-release ci for target repo."
+              cp ./ci/pre-release.yml gen/go/.github/workflows
+          elif [ $GITHUB_REF == "dev" ]
+            then
+              echo "dev branch detected ==> deploy beta-release ci for target repo."
+              cp ./ci/beta-release.yml gen/go/.github/workflows
+          fi
           cd gen/go
           go mod init github.com/infranyx/${{env.GO_REPOSITORY}}
           go mod tidy
@@ -59,7 +65,7 @@ jobs:
             const semver = require("semver");
 
             try{
-                const { GO_REPOSITORY , SRC_BRANCH } = process.env;
+                const { GO_REPOSITORY } = process.env;
                 if (!GO_REPOSITORY) throw new Error("Could Not Found Required Env Variables");
                 
                 const response = await github.rest.repos.listTags({
@@ -68,21 +74,21 @@ jobs:
                 });
                 const tags = response.data.map(tag => tag.name.toLowerCase());
 
-                console.log("\n================== Target Repo ==================");
+                console.log("\n================== Target Repo Info ==================");
                 console.log("tags: \n" , tags , "\n");
 
                 let latestVersion;
                 if (tags.length === 0) latestVersion = "v0.0.0";
                 else latestVersion = tags[0];
 
-                let finalVersion = semver.inc(latestVersion , "patch");
-                finalVersion = `v${finalVersion}`;
-                if (!finalVersion || !semver.valid(finalVersion)) {
-                  throw new Error(`Invalid Final Version: ${finalVersion}`);
+                let newVersion = semver.inc(latestVersion , "patch");
+                newVersion = `v${newVersion}`;
+                if (!newVersion || !semver.valid(newVersion)) {
+                  throw new Error(`Invalid New Version: ${newVersion}`);
                 }
 
-                console.log("final version: " , finalVersion , "\n");
-                console.log("===================================================\n");
+                console.log("new version: " , newVersion , "\n");
+                console.log("======================================================\n");
             }
             catch (error) {
                 core.setFailed(error.message);
