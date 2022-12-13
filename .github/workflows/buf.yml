@@ -50,6 +50,7 @@ jobs:
             const semver = require("semver");
 
             try{
+                const { GO_REPOSITORY } = process.env;
                 const response = await github.rest.repos.listTags({
                     owner : context.repo.owner,
                     repo: GO_REPOSITORY,
