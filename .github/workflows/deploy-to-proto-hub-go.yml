@@ -1,13 +1,18 @@
 name: Generate, Checking breaking change and Lint buf
 
-on: push
+# only trigger on pull request closed events.It will trigger on both <merged> and <closed> events.
+on:
+  pull_request:
+    types: [ closed ]
 
 env:
   GO_REPOSITORY: "protobuf-template-go"
-  RELEASE_TAG: "test"
 
 jobs:
-  build:
+  merge_job:
+    # this job will only run if the PR has been merged
+    if: github.event.pull_request.merged == true
+#    build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -51,14 +56,30 @@ jobs:
             const semver = require("semver");
 
             try{
-                const { GO_REPOSITORY } = process.env
+                const { GO_REPOSITORY } = process.env;
                 const response = await github.rest.repos.listTags({
                     owner : context.repo.owner,
                     repo: GO_REPOSITORY,
                 });
-                const tags = response.data.map(tag => tag.name);
-                console.log(tags);
-                console.log(context);
+                const tags = response.data.map(tag => tag.name.toLowerCase());
+            
+                console.log("\n================== Current Tags ==================");
+                console.log("current tags in target repo" , tags);
+                console.log("===================================================\n");
+            
+                let latestVersion;
+                if (tags.length === 0) latestVersion = "v0.0.0";
+                else latestVersion = tags[0];
+
+                let finalVersion = semver.inc(latestVersion , "patch");
+                finalVersion = `v${finalVersion}`;
+                if (!finalVersion || !semver.valid(finalVersion)) {
+                  throw new Error(`Invalid Final Version: ${finalVersion}`);
+                }
+
+                console.log("\n================== Final Version ==================");
+                console.log("final version in target repo" , finalVersion);
+                console.log("===================================================\n");
             }
             catch (error) {
                 core.setFailed(error.message);
