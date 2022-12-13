@@ -2,7 +2,7 @@ name: Generate, Lint and Check Breaking Changes
 
 on:
   pull_request:
-    types: [ created ]
+#    types: [ created ]
     branches:
       - main
       - dev
