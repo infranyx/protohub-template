@@ -1,1 +1,2 @@
 # protobuf-template
+test!

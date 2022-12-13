@@ -1,9 +1,11 @@
 name: Generate, Checking breaking change and Lint buf
 
-# only trigger on pull request closed events.It will trigger on both <merged> and <closed> events.
 on:
   pull_request:
     types: [ closed ]
+    branches:
+      - main
+      - dev
 
 env:
   GO_REPOSITORY: "protobuf-template-go"
@@ -12,7 +14,6 @@ jobs:
   merge_job:
     # this job will only run if the PR has been merged
     if: github.event.pull_request.merged == true
-#    build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -32,7 +33,15 @@ jobs:
       - name: Init Go Module
         run: |
           mkdir -p gen/go/.github/workflows
-          cp ./ci/release.yml gen/go/.github/workflows
+          if [ $GITHUB_REF == "main" ]
+            then
+              echo "main branch detected ==> deploy pre-release ci for target repo."
+              cp ./protohub-ci/pre-release.yml gen/go/.github/workflows
+          elif [ $GITHUB_REF == "dev" ]
+            then
+              echo "dev branch detected ==> deploy beta-release ci for target repo."
+              cp ./protohub-ci/beta-release.yml gen/go/.github/workflows
+          fi
           cd gen/go
           go mod init github.com/infranyx/${{env.GO_REPOSITORY}}
           go mod tidy
@@ -57,29 +66,29 @@ jobs:
 
             try{
                 const { GO_REPOSITORY } = process.env;
+                if (!GO_REPOSITORY) throw new Error("Could Not Found Required Env Variables");
+                
                 const response = await github.rest.repos.listTags({
                     owner : context.repo.owner,
                     repo: GO_REPOSITORY,
                 });
                 const tags = response.data.map(tag => tag.name.toLowerCase());
-            
-                console.log("\n================== Current Tags ==================");
-                console.log("current tags in target repo" , tags);
-                console.log("===================================================\n");
-            
+
+                console.log("\n================== Target Repo Info ==================");
+                console.log("tags: \n" , tags , "\n");
+
                 let latestVersion;
                 if (tags.length === 0) latestVersion = "v0.0.0";
                 else latestVersion = tags[0];
 
-                let finalVersion = semver.inc(latestVersion , "patch");
-                finalVersion = `v${finalVersion}`;
-                if (!finalVersion || !semver.valid(finalVersion)) {
-                  throw new Error(`Invalid Final Version: ${finalVersion}`);
+                let newVersion = semver.inc(latestVersion , "patch");
+                newVersion = `v${newVersion}`;
+                if (!newVersion || !semver.valid(newVersion)) {
+                  throw new Error(`Invalid New Version: ${newVersion}`);
                 }
 
-                console.log("\n================== Final Version ==================");
-                console.log("final version in target repo" , finalVersion);
-                console.log("===================================================\n");
+                console.log("new version: " , newVersion , "\n");
+                console.log("======================================================\n");
             }
             catch (error) {
                 core.setFailed(error.message);
