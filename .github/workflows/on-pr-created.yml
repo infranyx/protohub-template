@@ -1,4 +1,4 @@
-name: Generate, Lint and Check Breaking Changes
+name: Lint and Check Breaking Changes
 
 on:
   pull_request:
