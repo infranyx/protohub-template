@@ -5,9 +5,6 @@ on:
     branches:
       - main
 
-env:
-  GO_REPOSITORY: "protobuf-template-go"
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,26 +25,28 @@ jobs:
                     repo: context.repo.repo,
                 });
                 const tags = response.data.map(tag => tag.name.toLowerCase());
-                console.log(tags);
+            
+                console.log("\n================== Beta Release ==================");
+                console.log("tags: \n" , tags , "\n");
+            
                 let latestVersion;
                 if (tags.length === 0) latestVersion = "v0.0.0";
                 else latestVersion = tags[0];
 
-                let finalVersion = semver.inc(latestVersion , "patch");
-                finalVersion = `v${finalVersion}`;
-                if (!finalVersion || !semver.valid(finalVersion)) {
-                  throw new Error(`Invalid Final Version: ${finalVersion}`);
+                let newVersion = semver.inc(latestVersion , "patch");
+                newVersion = `v${newVersion}`;
+                if (!newVersion || !semver.valid(newVersion)) {
+                  throw new Error(`Invalid New Version: ${newVersion}`);
                 }
 
-                console.log("\n================== Final Version ==================");
-                console.log(`final version: ${finalVersion}`);
+                console.log("new version: " , newVersion , "\n");
                 console.log("===================================================\n");
 
                 await github.rest.repos.createRelease({
-                  draft: false,
-                  tag_name: finalVersion,
-                  release_name: finalVersion,
+                  tag_name: newVersion,
+                  release_name: newVersion,
                   generate_release_notes: true,
+                  draft: false,
                   prerelease: false,
                   make_latest: "false",
                   owner: context.repo.owner,

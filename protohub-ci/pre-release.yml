@@ -1,0 +1,58 @@
+name: Generate, Checking breaking change and Lint buf
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - run: npm i semver@7.3.8
+      - name: Create Golang Release
+        uses: "actions/github-script@v5"
+        with:
+          github-token: "${{ secrets.API_TOKEN_GITHUB }}"
+          script: |
+            const semver = require("semver");
+
+            try{
+                const response = await github.rest.repos.listTags({
+                    owner : context.repo.owner,
+                    repo: context.repo.repo,
+                });
+                const tags = response.data.map(tag => tag.name.toLowerCase());
+            
+                console.log("\n================== Pre Release ==================");
+                console.log("tags: \n" , tags , "\n");
+            
+                let latestVersion;
+                if (tags.length === 0) latestVersion = "v0.0.0";
+                else latestVersion = tags[0];
+
+                let newVersion = semver.inc(latestVersion , "minor");
+                newVersion = `v${newVersion}`;
+                if (!newVersion || !semver.valid(newVersion)) {
+                  throw new Error(`Invalid New Version: ${newVersion}`);
+                }
+            
+                console.log("new version: " , newVersion , "\n");
+                console.log("===================================================\n");
+
+                await github.rest.repos.createRelease({
+                  tag_name: newVersion,
+                  release_name: newVersion,
+                  generate_release_notes: true,
+                  draft: false,
+                  prerelease: true,
+                  make_latest: "false",
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                });
+            }
+            catch (error) {
+                core.setFailed(error.message);
+            }
