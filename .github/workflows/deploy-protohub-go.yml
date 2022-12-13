@@ -59,7 +59,7 @@ jobs:
           destination-repository-name: ${{env.TARGET_REPO}}
           target-branch: main
       - run: npm i semver@7.3.8
-      - name: Create Golang Release
+      - name: Target Release Info
         uses: "actions/github-script@v5"
         with:
           github-token: "${{ secrets.API_TOKEN_GITHUB }}"
