@@ -7,7 +7,6 @@ on:
 
 env:
   GO_REPOSITORY: "protobuf-template-go"
-  RELEASE_TAG: "test"
 
 jobs:
   build:
