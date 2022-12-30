@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package shared.error;
-option go_package = "./error";
+option go_package = "./error.v1";
 
 message CustomError {
   string title = 1;

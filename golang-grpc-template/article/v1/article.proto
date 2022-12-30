@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package golang_template.v1.article;
+package golang_template.article.v1;
 option go_package = "./article";
 
 message CreateArticleRequest {
