@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package error;
+package shared.error;
 option go_package = "./error";
 
 message CustomError {
@@ -8,6 +8,6 @@ message CustomError {
   int64 code = 2;
   string msg = 3;
   string timestamp = 4;
-  optional string stackTrace = 5;
+  optional string stack_trace = 5;
   map<string,string> details = 6;
 }
