@@ -2,7 +2,7 @@ name: Lint and Check Breaking Changes
 
 on:
   pull_request:
-#    types: [ created ]
+    #    types: [ created ]
     branches:
       - main
       - dev
@@ -28,10 +28,9 @@ jobs:
       - name: Buf Lint
         run: |
           buf lint
-      - name: Buf Breaking
-        run: |
-          buf breaking --against .git#branch=$GITHUB_REF
-      
+      # - name: Buf Breaking
+      #   run: |
+      #     buf breaking --against .git#branch=$GITHUB_REF
 
 #validate-protos:
 #  steps:
