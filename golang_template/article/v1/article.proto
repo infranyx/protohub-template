@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package article;
+package golang_template.article.v1;
 option go_package = "./article";
 
 message CreateArticleRequest {
@@ -21,7 +21,7 @@ message GetArticleByIdRequest {
 message GetArticleByIdResponse {
   string id = 1;
   string name = 2;
-//  string desc = 3;
+  string desc = 3;
 }
 
 service ArticleService{

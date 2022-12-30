@@ -1,4 +1,4 @@
-name: Generate, Lint, Check Breaking Changes and Deploy Proto-Hub
+name: Generate and Deploy To Proto-Hub
 
 on:
   pull_request:

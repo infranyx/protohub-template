@@ -1,0 +1,18 @@
+stages:
+  - release
+
+.install_dependencies:
+  before_script: |
+    wget -O /usr/local/bin/semver \
+      https://raw.githubusercontent.com/fsaintjacques/semver-tool/master/src/semver
+
+    chmod +x /usr/local/bin/semver
+
+release:
+  stage: release
+  script: |
+    VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))
+    test -z "$VERSION" && echo "no version tag found" && VERSION=v1.0.0
+    VERSION=$(semver bump major $VERSION)
+    git tag -a $VERSION -m "message" HEAD
+    git push --tags
