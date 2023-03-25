@@ -2,7 +2,7 @@ name: Generate and Deploy To Proto-Hub
 
 on:
   pull_request:
-    types: [ closed ]
+    types: [closed]
     branches:
       - main
       - dev
@@ -35,12 +35,12 @@ jobs:
           mkdir -p gen/go/.github/workflows
           if [ $GITHUB_REF == "main" ]
             then
-              echo "main branch detected ==> deploy pre-release ci for target repo."
-              cp ./protohub-ci/pre-release.yml gen/go/.github/workflows
+              echo "main branch detected ==> deploy minor-release ci for target repo."
+              cp ./.github/ci/minor-release.yml gen/go/.github/workflows
           elif [ $GITHUB_REF == "dev" ]
             then
-              echo "dev branch detected ==> deploy beta-release ci for target repo."
-              cp ./protohub-ci/beta-release.yml gen/go/.github/workflows
+              echo "dev branch detected ==> deploy patch-release ci for target repo."
+              cp ./.github/ci/patch-release.yml gen/go/.github/workflows
           fi
       - name: Init Go Module
         run: |
@@ -51,55 +51,54 @@ jobs:
       - name: Push To ProtoHub
         uses: cpina/github-action-push-to-another-repository@v1.5.1
         env:
-          # SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
           source-directory: "gen/go"
           destination-github-username: "infranyx"
           destination-repository-name: ${{env.TARGET_REPO}}
           target-branch: main
-      - run: npm i semver@7.3.8
-      - name: Target Release Info
-        uses: "actions/github-script@v5"
-        with:
-          github-token: "${{ secrets.API_TOKEN_GITHUB }}"
-          script: |
-            const semver = require("semver");
+      # - run: npm i semver@7.3.8
+      # - name: Target Release Info
+      #   uses: "actions/github-script@v5"
+      #   with:
+      #     github-token: "${{ secrets.API_TOKEN_GITHUB }}"
+      #     script: |
+      #       const semver = require("semver");
 
-            try{
-                const { TARGET_REPO , GITHUB_REF } = process.env;
-                if (!TARGET_REPO) throw new Error("Could Not Found Required Env Variables");
-                
-                const response = await github.rest.repos.listTags({
-                    owner : context.repo.owner,
-                    repo: TARGET_REPO,
-                });
-                const tags = response.data.map(tag => tag.name.toLowerCase());
+      #       try{
+      #           const { TARGET_REPO , GITHUB_REF } = process.env;
+      #           if (!TARGET_REPO) throw new Error("Could Not Found Required Env Variables");
 
-                console.log("\n================== Target Repo Info ==================");
-                console.log("Target Repo: " , TARGET_REPO , "\n");
-                console.log("Tags: \n" , tags , "\n");
+      #           const response = await github.rest.repos.listTags({
+      #               owner : context.repo.owner,
+      #               repo: TARGET_REPO,
+      #           });
+      #           const tags = response.data.map(tag => tag.name.toLowerCase());
 
-                let latestVersion;
-                if (tags.length === 0) latestVersion = "v0.0.0";
-                else latestVersion = tags[0];
-                
-                let newVersion;
-                if (GITHUB_REF === "main") {
-                    newVersion = semver.inc(latestVersion , "minor");
-                    console.log("New Pre-Release Version : " , newVersion , "\n");
-                }
-                else if (GITHUB_REF === "dev") {
-                    newVersion = semver.inc(latestVersion , "patch");
-                    console.log("New Beta-Release Version : " , newVersion , "\n");
-                }
-            
-                if (!newVersion || !semver.valid(newVersion)) {
-                  throw new Error(`Invalid New Version: ${newVersion}`);
-                }
+      #           console.log("\n================== Target Repo Info ==================");
+      #           console.log("Target Repo: " , TARGET_REPO , "\n");
+      #           console.log("Tags: \n" , tags , "\n");
 
-                console.log("======================================================\n");
-            }
-            catch (error) {
-                core.setFailed(error.message);
-            }
+      #           let latestVersion;
+      #           if (tags.length === 0) latestVersion = "v0.0.0";
+      #           else latestVersion = tags[0];
+
+      #           let newVersion;
+      #           if (GITHUB_REF === "main") {
+      #               newVersion = semver.inc(latestVersion , "minor");
+      #               console.log("New Pre-Release Version : " , newVersion , "\n");
+      #           }
+      #           else if (GITHUB_REF === "dev") {
+      #               newVersion = semver.inc(latestVersion , "patch");
+      #               console.log("New Beta-Release Version : " , newVersion , "\n");
+      #           }
+
+      #           if (!newVersion || !semver.valid(newVersion)) {
+      #             throw new Error(`Invalid New Version: ${newVersion}`);
+      #           }
+
+      #           console.log("======================================================\n");
+      #       }
+      #       catch (error) {
+      #           core.setFailed(error.message);
+      #       }

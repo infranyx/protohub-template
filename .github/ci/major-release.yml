@@ -1,0 +1,27 @@
+name: Create Major-Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: |
+          wget -O /usr/local/bin/semver \
+                https://raw.githubusercontent.com/fsaintjacques/semver-tool/master/src/semver
+          chmod +x /usr/local/bin/semver
+
+      - name: Create Major Release
+        run: |
+          VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))
+          test -z "$VERSION" && echo "no version tag found" && VERSION=v0.0.0
+          VERSION=$(semver bump major $VERSION)
+          git tag -a $VERSION -m "major release created" HEAD
+          git push --tags
+          echo "New Major-Release Created: ${VERSION}"
