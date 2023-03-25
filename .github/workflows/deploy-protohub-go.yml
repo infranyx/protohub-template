@@ -35,12 +35,12 @@ jobs:
           mkdir -p gen/go/.github/workflows
           if [ $GITHUB_REF == "main" ]
             then
-              echo "main branch detected ==> deploy pre-release ci for target repo."
-              cp ./protohub-ci/pre-release.yml gen/go/.github/workflows
+              echo "main branch detected ==> deploy minor-release ci for target repo."
+              cp ./.github/ci/minor-release.yml gen/go/.github/workflows
           elif [ $GITHUB_REF == "dev" ]
             then
-              echo "dev branch detected ==> deploy beta-release ci for target repo."
-              cp ./protohub-ci/beta-release.yml gen/go/.github/workflows
+              echo "dev branch detected ==> deploy patch-release ci for target repo."
+              cp ./.github/ci/patch-release.yml gen/go/.github/workflows
           fi
       - name: Init Go Module
         run: |
