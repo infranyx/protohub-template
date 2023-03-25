@@ -19,7 +19,7 @@ jobs:
 
       - name: Create Major Release
         run: |
-          VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))
+          VERSION=$(git describe --tags $(git rev-list --tags --max-count=1) 2>/dev/null)
           test -z "$VERSION" && echo "no version tag found" && VERSION=v0.0.0
           VERSION=$(semver bump major $VERSION)
           git tag -a $VERSION -m "major release created" HEAD
