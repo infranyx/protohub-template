@@ -11,17 +11,44 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Install Dependencies
         run: |
           wget -O /usr/local/bin/semver \
                 https://raw.githubusercontent.com/fsaintjacques/semver-tool/master/src/semver
           chmod +x /usr/local/bin/semver
 
-      - name: Create Major Release
+      - name: Create Major Version
         run: |
+          git fetch --all --tags
           VERSION=$(git describe --tags $(git rev-list --tags --max-count=1) 2>/dev/null)
           test -z "$VERSION" && echo "no version tag found" && VERSION=v0.0.0
-          VERSION=$(semver bump major $VERSION)
-          git tag -a $VERSION -m "major release created" HEAD
-          git push --tags
-          echo "New Major-Release Created: ${VERSION}"
+          echo "VERSION=$(semver bump major $VERSION)" >> $GITHUB_ENV
+          echo "$VERSION"
+
+      - name: Create Release
+        uses: "actions/github-script@v6"
+        env:
+          VERSION: "${{env.VERSION}}"
+        with:
+          script: |
+            const { VERSION } = process.env
+            try{
+                await github.rest.repos.createRelease({
+                  tag_name: VERSION,
+                  release_name: VERSION,
+                  generate_release_notes: true,
+                  draft: false,
+                  prerelease: false,
+                  make_latest: "false",
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                });
+                
+                console.log("New Major-Release Created: " , VERSION , "\n");
+                console.log("===================================================");
+            }
+            catch (error) {
+                core.setFailed(error.message);
+            }
