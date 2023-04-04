@@ -1,4 +1,4 @@
-name: Create Patcch-Release
+name: Create Patch-Release
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
       - name: Create Patch Version
         run: |
           git fetch --all --tags
-          VERSION=$(git describe --tags $(git rev-list --tags --max-count=1) 2>/dev/null)
+          VERSION=$(git describe --tags $(git rev-list --tags --max-count=1) 2>/dev/null || echo "")
           test -z "$VERSION" && echo "no version tag found" && VERSION=v0.0.0
           echo "VERSION=$(semver bump patch $VERSION)" >> $GITHUB_ENV
           echo "$VERSION"
